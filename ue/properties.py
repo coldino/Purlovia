@@ -1026,6 +1026,55 @@ class EngineVersion(UEBase):
         self._newField('branch', StringProperty(self))
 
 
+class Texture2DMipMap(UEBase):
+    display_fields = ('size_x', 'size_y', 'bulk_info')
+
+    cooked: bool
+    bulk_info: BulkDataHeader
+    size_x: int
+    size_y: int
+
+    def _deserialise(self):
+        self._newField('cooked', self.stream.readBool32())
+        self._newField('bulk_info', BulkDataHeader(self).deserialise())
+
+        if self.bulk_info.is_zlib_compressed:
+            raise RuntimeError('Zlib compressed bulk data is not supported.')
+
+        if self.bulk_info.is_payload_inline:
+            # Bulk data is right after the header, skip it as we don't know the dimensions yet.
+            self.stream.offset += self.bulk_info.length
+
+        self._newField('size_x', self.stream.readInt32())
+        self._newField('size_y', self.stream.readInt32())
+
+    def __str__(self):
+        return f'Texture2DMipMap ({self.size_x}x{self.size_y}, {self.bulk_info})'
+
+
+class TexturePlatformData(UEBase):
+    display_fields = ('size_x', 'size_y')
+
+    size_x: int
+    size_y: int
+    slice_count: int
+    pixel_format: StringProperty
+    length: int
+    mipmaps: Table
+
+    def _deserialise(self):
+        self._newField('size_x', self.stream.readInt32())
+        self._newField('size_y', self.stream.readInt32())
+        self._newField('slice_count', self.stream.readInt32())
+        self._newField('pixel_format', StringProperty(self).deserialise())
+        self._newField('unknown_field', self.stream.readInt32())
+        self._newField('length', self.stream.readUInt32())
+        self._newField('mipmaps', Table(self).deserialise(Texture2DMipMap, self.length))
+
+    def __str__(self):
+        return f'TexturePlatformData ({self.pixel_format}, {self.length}x {self.size_x}x{self.size_y})'
+
+
 TYPE_MAP = {
     'FloatProperty': FloatProperty,
     'DoubleProperty': DoubleProperty,
