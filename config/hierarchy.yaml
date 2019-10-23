@@ -187,7 +187,7 @@
 - '/Script/ShooterGame.PrimalStructureSettings'
 - '/Script/ShooterGame.PrimalSupplyCrateItemSet'
 - '/Script/ShooterGame.PrimalSupplyCrateItemSets'
-- '/Script/ShooterGame.PrimalAIState'
+- '/Script/ShooterGame.PrimalAIState':
     - '/Script/ShooterGame.PrimalAIStateBPBase'
     - '/Script/ShooterGame.PrimalAIStateDinoMeleeState':
         - '/Script/ShooterGame.PrimalAIStateDinoFlyerGrab'
@@ -197,7 +197,7 @@
         - '/Script/ShooterGame.PrimalAIStateDinoSpineyLizardTailRangeState'
     - '/Script/ShooterGame.PrimalAIStateDinoSpiderMinions'
     - '/Script/ShooterGame.PrimalAIStateDinoSpiderRangedAcidState'
-- '/Script/ShooterGame.RadialSelectorHUD'
+- '/Script/ShooterGame.RadialSelectorHUD':
     - '/Script/ShooterGame.RadialSelectorHUD_Inventory'
     - '/Script/ShooterGame.RadialSelectorHUD_MultiUse'
     - '/Script/ShooterGame.RadialSelectorHUD_PlayerAction'
@@ -223,9 +223,9 @@
             - '/Script/ShooterGame.CharacterViewPanelWidget'
             - '/Script/ShooterGame.StatWidget'
             - '/Script/ShooterGame.GamepadButtonLegendWidget'
-            - '/Script/ShooterGame.ToolTipWidget'
+            - '/Script/ShooterGame.ToolTipWidget':
                 - '/Script/ShooterGame.PrimalDinoToolTipWidget'
-                - '/Script/ShooterGame.TooltipSmartLayoutWidget'
+                - '/Script/ShooterGame.TooltipSmartLayoutWidget':
                     - '/Script/ShooterGame.DinoListItemTooltip'
             - '/Script/ShooterGame.PrimalUI':
                 - '/Script/ShooterGame.PlayerHUDUI'
