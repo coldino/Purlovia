@@ -6,7 +6,7 @@ from typing import *
 from .base import UEBase
 from .context import INCLUDE_METADATA, get_ctx
 from .coretypes import *
-from .properties import Box, CustomVersion, EngineVersion, Guid, PropertyTable, StringProperty
+from .properties import AFTER_PROPERTY_TABLE_TYPES, Box, CustomVersion, EngineVersion, Guid, PropertyTable, StringProperty
 from .stream import MemoryStream
 from .utils import get_clean_name, get_clean_namespaced_name
 
@@ -295,6 +295,15 @@ class ExportTableItem(UEBase):
         stream = MemoryStream(self.stream, self.serial_offset, self.serial_size)
         self._newField('properties', PropertyTable(self, weakref.proxy(stream)))
         self.properties.link()
+
+        # Read data that some types have, located after the property table
+        if self.klass.value:
+            stream.offset += 4  # skip the remaining bytes of the PropertyTable marker
+
+            type_cls = AFTER_PROPERTY_TABLE_TYPES.get(str(self.klass.value.name), None)
+            if type_cls:
+                extended_object = type_cls(self, weakref.proxy(stream))
+                self._newField('extended_data', extended_object.deserialise(self.properties))
 
     def __str__(self):
         parent = get_clean_name(self.super)
