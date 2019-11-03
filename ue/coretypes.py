@@ -16,6 +16,8 @@ __all__ = (
     'ObjectIndex',
     'GenerationInfo',
     'CompressedChunk',
+    'BulkDataHeader',
+    'StripDataFlags',
 )
 
 
