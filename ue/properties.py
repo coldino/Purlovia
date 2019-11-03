@@ -1068,11 +1068,50 @@ class TexturePlatformData(UEBase):
         self._newField('slice_count', self.stream.readInt32())
         self._newField('pixel_format', StringProperty(self).deserialise())
         self._newField('unknown_field', self.stream.readInt32())
-        self._newField('length', self.stream.readUInt32())
-        self._newField('mipmaps', Table(self).deserialise(Texture2DMipMap, self.length))
+        self._newField('mipmaps', Table(self).deserialise(Texture2DMipMap, self.stream.readUInt32()))
 
     def __str__(self):
-        return f'TexturePlatformData ({self.pixel_format}, {self.length}x {self.size_x}x{self.size_y})'
+        return f'TexturePlatformData ({self.pixel_format}, {len(self.mipmaps)}x {self.size_x}x{self.size_y})'
+
+
+class Texture2D(UEBase):
+    display_fields = ()
+
+    values: List["TexturePlatformData"]
+    strip_flags: StripDataFlags
+
+    def _deserialise(self):
+        self._newField('strip_flags', StripDataFlags(self))
+        strip_flags2 = StripDataFlags(self).deserialise()
+        assert self.strip_flags.global_flags == strip_flags2.global_flags
+        assert self.strip_flags.class_flags == strip_flags2.class_flags
+
+        values = []
+        self._newField('is_cooked', self.stream.readBool32())
+        while self.is_cooked and self.stream.offset < (self.stream.end - 8):
+            value = self._parse_platform_data()
+            if value is None:
+                break
+            values.append(value)
+        self._newField('values', values)
+
+    def _parse_platform_data(self) -> Optional[TexturePlatformData]:
+        pixel_format = NameIndex(self).deserialise()
+        pixel_format.link()
+        if pixel_format.index is self.asset.none_index:
+            return None
+
+        next_offset = self.stream.readUInt32()
+        platform_data = TexturePlatformData(self).deserialise()
+        platform_data.link()
+
+        if self.stream.offset != next_offset:
+            logger.warning(
+                f'Read of texture platform data could have failed: skipping to {next_offset} (+{next_offset - self.stream.offset})'
+            )
+            self.stream.offset = next_offset
+        assert str(platform_data.pixel_format) == str(pixel_format)
+        return platform_data
 
 
 class CompressedAudioChunk(UEBase):
