@@ -98,12 +98,6 @@ class UAsset(UEBase):
         self._newField('imports', self._parseTable(self.imports_chunk, ImportTableItem))
         self._newField('exports', self._parseTable(self.exports_chunk, ExportTableItem))
 
-        if ctx.bulk_data and self.bulk_data_start_offset:
-            bulk_stream = MemoryStream(self.stream, self.bulk_data_start_offset)
-            bulk_length = self.world_tile_info_data_offset - self.bulk_data_start_offset
-            self._newField('bulk_length', bulk_length)
-            self._newField('bulk_data', bulk_stream.readBytes(bulk_length))
-
         if self.world_tile_info_data_offset is not 0:
             tile_info_stream = MemoryStream(self.stream, self.world_tile_info_data_offset)
             self._newField('tile_info', WorldTileInfo(self, tile_info_stream))
@@ -296,8 +290,9 @@ class ExportTableItem(UEBase):
         self._newField('properties', PropertyTable(self, weakref.proxy(stream)))
         self.properties.link()
 
+        ctx = get_ctx()
         # Read data that some types have, located after the property table
-        if self.klass.value:
+        if ctx.extended_properties and self.klass.value:
             stream.offset += 4  # skip the remaining bytes of the PropertyTable marker
 
             type_cls = AFTER_PROPERTY_TABLE_TYPES.get(str(self.klass.value.name), None)
