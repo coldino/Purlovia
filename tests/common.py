@@ -1,4 +1,4 @@
-from typing import *
+from typing import Callable
 
 import pytest  # type: ignore
 
@@ -10,7 +10,8 @@ from ue.asset import ExportTableItem, UAsset
 from ue.context import ParsingContext, get_ctx, ue_parsing_context
 from ue.loader import AssetLoader
 
-PGD_ASSETNAME = '/Game/Mods/1821554891/PrimalGameData_BP_PurloviaTEST'
+TEST_PGD_PKG = '/Game/Mods/1821554891/PrimalGameData_BP_PurloviaTEST'
+TEST_PGD_CLS = TEST_PGD_PKG + '.PrimalGameData_BP_PurloviaTEST_C'
 
 PRIMAL_CHR = '/Script/ShooterGame.PrimalCharacter'
 PRIMAL_DINO_CHR = '/Script/ShooterGame.PrimalDinoCharacter'
@@ -76,3 +77,16 @@ def fixture_test_hierarchy(loader: AssetLoader, internal_hierarchy):  # pylint: 
 def fixture_ark_types(loader: AssetLoader, internal_hierarchy):  # pylint: disable=unused-argument
     # Scan just a few Ark core types
     ue.hierarchy.explore_asset(DCSC, loader)
+
+
+@pytest.fixture(name='scan_and_load', scope='module')
+def fixture_scan_and_load(loader: AssetLoader, ark_types):  # pylint: disable=unused-argument
+    def _scan_and_load(cls_name: str):
+        cls = loader.load_class(cls_name)
+        ue.hierarchy.explore_asset(cls.asset.assetname, loader)
+        return cls
+
+    return _scan_and_load
+
+
+ScanLoadFn = Callable[[str], ExportTableItem]

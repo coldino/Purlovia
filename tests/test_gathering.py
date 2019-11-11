@@ -12,11 +12,9 @@ from .common import *
 
 
 @pytest.mark.requires_game
-def test_gather_purloviatest_pgd(loader: AssetLoader, internal_hierarchy, test_hierarchy):  # pylint: disable=unused-argument
-    asset = loader[PGD_ASSETNAME]
-    assert asset.default_export
-
-    pgd: PrimalGameData = gather_properties(asset.default_export)
+def test_gather_purloviatest_pgd(scan_and_load):
+    export = scan_and_load(TEST_PGD_CLS)
+    pgd: PrimalGameData = gather_properties(export)
     assert isinstance(pgd, UEProxyStructure)
     assert isinstance(pgd, PrimalGameData)
 
@@ -25,8 +23,8 @@ def test_gather_purloviatest_pgd(loader: AssetLoader, internal_hierarchy, test_h
 
 
 @pytest.mark.requires_game
-def test_gather_dodo(loader: AssetLoader, dodos):  # pylint: disable=unused-argument
-    dodo = loader.load_class(DODO_CHR)
+def test_gather_dodo(scan_and_load):
+    dodo = scan_and_load(DODO_CHR)
     dodo_chr: PrimalDinoCharacter = gather_properties(dodo)
     assert isinstance(dodo_chr, UEProxyStructure)
     assert isinstance(dodo_chr, PrimalDinoCharacter)
@@ -34,20 +32,18 @@ def test_gather_dodo(loader: AssetLoader, dodos):  # pylint: disable=unused-argu
 
 
 @pytest.mark.requires_game
-def test_gather_ab_dodo(loader: AssetLoader, dodos):  # pylint: disable=unused-argument
-    # dodo_ab = loader[DODO_AB_CHR].default_export
-    dodo_ab = loader.load_class(DODO_AB_CHR)
+def test_gather_ab_dodo(scan_and_load):
+    dodo_ab = scan_and_load(DODO_AB_CHR)
     assert inherits_from(dodo_ab, DODO_CHR)
     dodo_ab_chr: PrimalDinoCharacter = gather_properties(dodo_ab)
     assert isinstance(dodo_ab_chr, UEProxyStructure)
     assert isinstance(dodo_ab_chr, PrimalDinoCharacter)
     assert str(dodo_ab_chr.DescriptiveName[0]) == 'Aberrant Dodo'
-    # TODO: Failing because the properties are in Default__ not the main class!
 
 
 @pytest.mark.requires_game
-def test_gather_dodo_dcsc(loader: AssetLoader, dodos):  # pylint: disable=unused-argument
-    dodo = loader.load_class(DODO_CHR)
+def test_gather_dodo_dcsc(scan_and_load):
+    dodo = scan_and_load(DODO_CHR)
     dodo_dcsc = gather_dcsc_properties(dodo)
     assert isinstance(dodo_dcsc, UEProxyStructure)
     assert isinstance(dodo_dcsc, PrimalDinoStatusComponent)
@@ -57,8 +53,8 @@ def test_gather_dodo_dcsc(loader: AssetLoader, dodos):  # pylint: disable=unused
 
 
 @pytest.mark.requires_game
-def test_gather_troodon_dcsc(loader: AssetLoader, troodon):  # pylint: disable=unused-argument
-    chr_export = loader.load_class(TROODON_CHR)
+def test_gather_troodon_dcsc(scan_and_load):
+    chr_export = scan_and_load(TROODON_CHR)
     props = gather_dcsc_properties(chr_export)
     assert isinstance(props, UEProxyStructure)
     assert isinstance(props, PrimalDinoStatusComponent)
@@ -68,11 +64,11 @@ def test_gather_troodon_dcsc(loader: AssetLoader, troodon):  # pylint: disable=u
 
 
 @pytest.mark.requires_game
-def test_gather_troodon_dcsc_alt(loader: AssetLoader, troodon):  # pylint: disable=unused-argument
-    chr_export = loader.load_class(TROODON_CHR)
+def test_gather_troodon_dcsc_alt(scan_and_load: ScanLoadFn):
+    chr_export = scan_and_load(TROODON_CHR)
     props = gather_dcsc_properties(chr_export, alt=True)
     assert isinstance(props, UEProxyStructure)
     assert isinstance(props, PrimalDinoStatusComponent)
     assert props.MaxStatusValues[0] == 200  # only in Troodon DCSC asset
-    assert props.MaxStatusValues[4] == 100  # was 200 in Troodon chr asset, skipped
+    assert props.MaxStatusValues[4] == 100  # was 200 in Troodon chr asset, skipped due to alt=True
     assert props.MaxStatusValues[7] == 140  # in DCSC, overridden in Troodon DCSC
