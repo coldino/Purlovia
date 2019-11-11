@@ -2,24 +2,6 @@ import ue.hierarchy
 
 from .common import *
 
-PRIMAL_DINO_CHR = '/Script/ShooterGame.PrimalDinoCharacter'
-PRIMAL_CHR = '/Script/ShooterGame.PrimalCharacter'
-DODO_CHR = '/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP_C'
-DINO_CHR = '/Game/PrimalEarth/CoreBlueprints/Dino_Character_BP.Dino_Character_BP_C'
-DODO_AB_CHR = '/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP_Aberrant.Dodo_Character_BP_Aberrant_C'
-
-
-@pytest.fixture(name='internal_hierarchy')
-def fixture_internal_hierarchy():
-    ue.hierarchy.tree.clear()
-    ue.hierarchy.load_internal_hierarchy('config/hierarchy.yaml')
-
-
-@pytest.fixture(name='dodos')
-def fixture_dodos(loader: AssetLoader, internal_hierarchy):  # pylint: disable=unused-argument
-    # Scan the Dodo directory
-    ue.hierarchy.explore_path('/Game/PrimalEarth/Dinos/Dodo', loader, set())
-
 
 @pytest.mark.requires_game
 def test_hierarchy_init(internal_hierarchy):  # pylint: disable=unused-argument

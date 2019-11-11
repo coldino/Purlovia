@@ -1,6 +1,8 @@
 from typing import *
 
 from .base import UEBase
+from .hierarchy import find_parent_classes
+from .loader import AssetLoader
 from .properties import BoolProperty, ByteProperty, DummyAsset, FloatProperty, IntProperty, StringProperty
 
 __all__ = [
@@ -12,7 +14,8 @@ __all__ = [
     'uebools',
     'ueints',
     'uestrings',
-    'proxy_for_type',
+    'get_proxy_for_type',
+    'get_proxy_for_exact_type',
 ]
 
 _UETYPE = '__uetype'
@@ -96,7 +99,7 @@ class UEProxyStructure:
                 overrides.add((name, i))
 
     def has_override(self, name: str, index: int = 0):
-        '''Returns True if a value has bee set (excluding the defaults).'''
+        '''Returns True if a value has been set (excluding the defaults).'''
         return (name, index) in getattr(self, _UEOVERRIDDEN)
 
 
@@ -108,7 +111,26 @@ def _register_proxy(uetype: str, cls: Type[UEProxyStructure]):
     _proxies[uetype] = cls
 
 
-def proxy_for_type(uetype: str):
+MISSING = object()
+
+
+def get_proxy_for_type(cls_name: str, loader: AssetLoader, default=MISSING) -> UEProxyStructure:
+    '''
+    Step up through the inheritance tree to find the first available proxy type.
+    '''
+    klass = loader.load_class(cls_name)
+    for parent_cls_name in find_parent_classes(klass, include_self=True):
+        proxy = get_proxy_for_exact_type(parent_cls_name)
+        if proxy:
+            return proxy
+
+    if default is MISSING:
+        raise TypeError(f"No proxy type available for {cls_name}")
+
+    return default
+
+
+def get_proxy_for_exact_type(uetype: str):
     global _proxies  # pylint: disable=global-statement
     cls = _proxies.get(uetype, None)
     if cls is None:

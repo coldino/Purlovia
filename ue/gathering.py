@@ -1,14 +1,16 @@
 from functools import lru_cache
 from typing import *
+from typing import cast
 
 from ark.defaults import *
 
 from .asset import ExportTableItem
 from .base import UEBase
 from .consts import BLUEPRINT_GENERATED_CLASS_CLS
+from .hierarchy import find_parent_classes
 from .loader import AssetLoader
 from .properties import ObjectProperty
-from .proxy import UEProxyStructure, proxy_for_type
+from .proxy import UEProxyStructure, get_proxy_for_type
 from .tree import discover_inheritance_chain, is_fullname_an_asset
 
 __all__ = [
@@ -19,39 +21,41 @@ __all__ = [
 Tproxy = TypeVar('Tproxy', bound=UEProxyStructure)
 
 
-def gather_properties(export: ExportTableItem) -> Tproxy:
+def gather_properties(export: Union[ExportTableItem, ObjectProperty]) -> Tproxy:
     '''Collect properties from an export, respecting the inheritance tree.'''
     if isinstance(export, ObjectProperty):
-        return gather_properties(export.value)
+        return gather_properties(cast(ExportTableItem, export.value))
 
     if not isinstance(export, ExportTableItem):
         raise TypeError("ExportTableItem required")
 
-    chain = discover_inheritance_chain(export)
-    proxy = None
-    while not proxy and chain:
-        baseclass_fullname = chain.pop(0)
-        proxy = proxy_for_type(baseclass_fullname)
+    assert export.fullname
+    assert export.asset and export.asset.loader
+    loader = export.asset.loader
+    proxy = get_proxy_for_type(export.fullname, loader)
 
-    if not proxy:
-        raise TypeError(f"No proxy type available for {baseclass_fullname}")
-
-    for fullname in chain:
+    for fullname in reversed(list(find_parent_classes(export, include_self=True))):
         if not is_fullname_an_asset(fullname):
             continue  # Defaults are already in proxy - skip
 
-        props = get_default_props_for_class(fullname, export.asset.loader)
+        props = get_default_props_for_class(fullname, loader)
         proxy.update(props)
 
-    return proxy
+    return cast(Tproxy, proxy)
 
 
-def get_default_props_for_class(fullname: str, loader: AssetLoader) -> Mapping[str, Mapping[int, UEBase]]:
+def get_default_props_for_class(klass: Union[str, ExportTableItem], loader: AssetLoader) -> Mapping[str, Mapping[int, UEBase]]:
     '''Fetch properties for an export.
 
     This reads the properties directly for bare classes, or finds the appropriate
     Default__ prefixed export for BlueprintGeneratedClasses.'''
-    cls = loader.load_class(fullname)
+    cls: ExportTableItem
+    if isinstance(klass, str):
+        cls = loader.load_class(klass)
+    elif isinstance(klass, ExportTableItem):
+        cls = klass
+    else:
+        raise TypeError("Must supply an export or fullname of an export")
 
     # Special-case all BP-generated classes - redirect to the Default__ export's properties
     if cls.klass and cls.klass.value.fullname == BLUEPRINT_GENERATED_CLASS_CLS:

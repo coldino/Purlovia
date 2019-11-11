@@ -22,6 +22,7 @@ __all__ = [
     'find_sub_classes',
     'find_parent_classes',
     'load_internal_hierarchy',
+    'explore_asset',
     'explore_path',
 ]
 
@@ -172,7 +173,9 @@ def load_internal_hierarchy(filename: Path):
     walk_hierarchy_yaml(ROOT_NAME, hierarchy_config[ROOT_NAME])
 
 
-# export_path('...', loader, config.optimisation.SearchIgnore)
+def explore_asset(assetname: str, loader: AssetLoader):
+    asset = loader[assetname]
+    _ingest_asset(asset, loader)
 
 
 def explore_path(path: str, loader: AssetLoader, excludes: Iterable[str], verbose=False):
