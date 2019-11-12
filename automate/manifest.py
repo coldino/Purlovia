@@ -37,7 +37,7 @@ def generate_manifest(directory: Path, output_file: Path, ignores: Sequence[str]
     files: Dict[str, dict] = dict()
 
     # Collect info from each json file
-    for filename in directory.glob('*.json'):
+    for filename in directory.glob('**/*.json'):
         if not filename.is_file:
             continue
 

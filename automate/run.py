@@ -16,7 +16,6 @@ from .export import export_values
 from .export_wiki import export_map_data
 from .git import GitManager
 from .manifest import update_manifest
-from .manifest_wiki import update_manifest_wiki
 from .notification import handle_exception
 
 # pylint: enable=invalid-name
@@ -187,7 +186,7 @@ def run(config: ConfigFile):
 
         # Export map data for the Ark Wiki, update manifest, commit
         export_map_data(arkman, set(mods), config)
-        update_manifest_wiki(config.settings.OutputPath / config.export_wiki.PublishSubDir)
+        update_manifest(config.settings.OutputPath / config.export_wiki.PublishSubDir)
         git.after_exports(config.export_wiki.PublishSubDir, config.export_wiki.CommitHeader)
 
         # Push any changes
