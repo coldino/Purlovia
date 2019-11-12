@@ -4,6 +4,7 @@ import pytest  # type: ignore
 
 import ue.hierarchy
 from ark.discovery import initialise_hierarchy
+from ark.types import *
 from automate.ark import ArkSteamManager
 from config import ConfigFile, get_global_config
 from ue.asset import ExportTableItem, UAsset
@@ -12,11 +13,6 @@ from ue.loader import AssetLoader
 
 TEST_PGD_PKG = '/Game/Mods/1821554891/PrimalGameData_BP_PurloviaTEST'
 TEST_PGD_CLS = TEST_PGD_PKG + '.PrimalGameData_BP_PurloviaTEST_C'
-
-PRIMAL_CHR = '/Script/ShooterGame.PrimalCharacter'
-PRIMAL_DINO_CHR = '/Script/ShooterGame.PrimalDinoCharacter'
-DINO_CHR = '/Game/PrimalEarth/CoreBlueprints/Dino_Character_BP.Dino_Character_BP_C'
-DCSC = '/Game/PrimalEarth/CoreBlueprints/DinoCharacterStatusComponent_BP.DinoCharacterStatusComponent_BP_C'
 
 TROODON_CHR = '/Game/PrimalEarth/Dinos/Troodon/Troodon_Character_BP.Troodon_Character_BP_C'
 DODO_CHR = '/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP_C'
@@ -76,7 +72,7 @@ def fixture_test_hierarchy(loader: AssetLoader, internal_hierarchy):  # pylint: 
 @pytest.fixture(name='ark_types', scope='module')
 def fixture_ark_types(loader: AssetLoader, internal_hierarchy):  # pylint: disable=unused-argument
     # Scan just a few Ark core types
-    ue.hierarchy.explore_asset(DCSC, loader)
+    ue.hierarchy.explore_asset(DCSC_CLS, loader)
 
 
 @pytest.fixture(name='scan_and_load', scope='module')

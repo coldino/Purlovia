@@ -32,7 +32,7 @@ def gather_properties(export: Union[ExportTableItem, ObjectProperty]) -> Tproxy:
     assert export.fullname
     assert export.asset and export.asset.loader
     loader = export.asset.loader
-    proxy = get_proxy_for_type(export.fullname, loader)
+    proxy: Tproxy = get_proxy_for_type(export.fullname, loader)
 
     for fullname in reversed(list(find_parent_classes(export, include_self=True))):
         if not is_fullname_an_asset(fullname):
@@ -41,7 +41,7 @@ def gather_properties(export: Union[ExportTableItem, ObjectProperty]) -> Tproxy:
         props = get_default_props_for_class(fullname, loader)
         proxy.update(props)
 
-    return cast(Tproxy, proxy)
+    return proxy
 
 
 def get_default_props_for_class(klass: Union[str, ExportTableItem], loader: AssetLoader) -> Mapping[str, Mapping[int, UEBase]]:

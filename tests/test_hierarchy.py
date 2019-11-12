@@ -6,7 +6,7 @@ from .common import *
 @pytest.mark.requires_game
 def test_hierarchy_init(internal_hierarchy):  # pylint: disable=unused-argument
     # Verify that some basic UE/ShooterGame types are in the hierarchy
-    it = ue.hierarchy.find_parent_classes(PRIMAL_CHR)
+    it = ue.hierarchy.find_parent_classes(PRIMAL_CHR_CLS)
     assert next(it) == '/Script/Engine.Character'
     assert next(it) == '/Script/Engine.Pawn'
     assert next(it) == '/Script/Engine.Actor'
@@ -24,25 +24,25 @@ def test_exploring_assets(dodos):  # pylint: disable=unused-argument
     assert DODO_AB_CHR in tree
 
     # Also ensure it loaded the parent asset (which is outside this directory)
-    assert DINO_CHR in tree
+    assert DINO_CHR_CLS in tree
 
     # ...and that they're all linked
     assert tree[DODO_AB_CHR].parent is tree[DODO_CHR]
-    assert tree[DODO_CHR].parent is tree[DINO_CHR]
-    assert tree[DINO_CHR].parent is tree[PRIMAL_DINO_CHR]
-    assert tree[PRIMAL_DINO_CHR].parent is tree[PRIMAL_CHR]
+    assert tree[DODO_CHR].parent is tree[DINO_CHR_CLS]
+    assert tree[DINO_CHR_CLS].parent is tree[PDC_CLS]
+    assert tree[PDC_CLS].parent is tree[PRIMAL_CHR_CLS]
 
 
 @pytest.mark.requires_game
 def test_find_parents(dodos):  # pylint: disable=unused-argument
     parents = list(ue.hierarchy.find_parent_classes(DODO_CHR))
-    expected = [DINO_CHR, PRIMAL_DINO_CHR, '/Script/ShooterGame.PrimalCharacter', '/Script/Engine.Character']
+    expected = [DINO_CHR_CLS, PDC_CLS, '/Script/ShooterGame.PrimalCharacter', '/Script/Engine.Character']
     assert parents[:len(expected)] == expected
 
 
 @pytest.mark.requires_game
 def test_find_subclasses(dodos):  # pylint: disable=unused-argument
-    subclasses = list(ue.hierarchy.find_sub_classes(DINO_CHR))
+    subclasses = list(ue.hierarchy.find_sub_classes(DINO_CHR_CLS))
     assert DODO_CHR in subclasses
     assert DODO_AB_CHR in subclasses
 
@@ -54,8 +54,8 @@ def test_inherits_from(loader: AssetLoader, dodos):  # pylint: disable=unused-ar
     assert dodo_ab_asset.default_export
 
     # Ab Dodo inherits from Dino Chr
-    assert ue.hierarchy.inherits_from(dodo_ab_asset.default_export, DINO_CHR)
-    assert ue.hierarchy.inherits_from(dodo_ab_asset.default_class, DINO_CHR)
+    assert ue.hierarchy.inherits_from(dodo_ab_asset.default_export, DINO_CHR_CLS)
+    assert ue.hierarchy.inherits_from(dodo_ab_asset.default_class, DINO_CHR_CLS)
 
     # Ab Dodo inherits from Dodo Chr
     assert ue.hierarchy.inherits_from(dodo_ab_asset.default_export, DODO_CHR)

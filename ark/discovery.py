@@ -11,9 +11,9 @@ from ue.loader import AssetLoader, AssetLoadException
 from utils.cachefile import cache_data
 
 from .asset import findSubComponentExports, findSubComponentParentPackages
-from .common import CHR_CLS, CHR_PKG, DCSC_CLS, DCSC_PKG
 from .overrides import get_overrides_for_species
 from .tree import inherits_from, walk_parents
+from .types import DCSC_CLS, DINO_CHR_CLS
 
 __all__ = [
     'SpeciesDiscoverer',
@@ -31,7 +31,7 @@ def is_species(cls_name: str, loader: AssetLoader, *, skip_character_check=False
     `loader` needs to be an asset loader
     `skip_character_check` to avoid checking
     '''
-    if not skip_character_check and not ue.hierarchy.inherits_from(cls_name, CHR_CLS):
+    if not skip_character_check and not ue.hierarchy.inherits_from(cls_name, DINO_CHR_CLS):
         return False
 
     with ue_parsing_context(properties=False):
@@ -64,7 +64,7 @@ class SpeciesDiscoverer:
         official_modids -= set(config.settings.SeparateOfficialMods)
         official_mod_prefixes = tuple(f'/Game/Mods/{modid}/' for modid in official_modids)
 
-        for cls_name in ue.hierarchy.find_sub_classes(CHR_CLS):
+        for cls_name in ue.hierarchy.find_sub_classes(DINO_CHR_CLS):
             assetname = cls_name[:cls_name.rfind('.')]
 
             # Skip anything in the mods directory that isn't one of the listed official mods
@@ -83,7 +83,7 @@ class SpeciesDiscoverer:
 
     def discover_mod_species(self, modid: str) -> Iterator[str]:
         clean_path = self.loader.clean_asset_name(f'/Game/Mods/{modid}') + '/'
-        for cls_name in ue.hierarchy.find_sub_classes(CHR_CLS):
+        for cls_name in ue.hierarchy.find_sub_classes(DINO_CHR_CLS):
             assetname = cls_name[:cls_name.rfind('.')]
             if assetname.startswith(clean_path):
                 # Do a full check that this is a species asset

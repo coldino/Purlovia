@@ -7,8 +7,22 @@ from ue.proxy import *
 STAT_COUNT = 12
 COLOR_REGION_COUNT = 6
 
+PDSC_CLS = '/Script/ShooterGame.PrimalDinoStatusComponent'
+PDC_CLS = '/Script/ShooterGame.PrimalDinoCharacter'
+PGD_CLS = '/Script/ShooterGame.PrimalGameData'
+PRIMAL_CHR_CLS = '/Script/ShooterGame.PrimalCharacter'
+PRIMAL_ITEM_CLS = '/Script/ShooterGame.PrimalItem'
+PRIMAL_ITEM_DYE_CLS = '/Script/ShooterGame.PrimalItem_Dye'
+PRIMAL_DINO_SETTINGS_CLS = '/Script/ShooterGame.PrimalDinoSettings'
+SHOOTER_CHR_MOVEMENT_CLS = '/Script/ShooterGame.ShooterCharacterMovement'
 
-class PrimalDinoStatusComponent(UEProxyStructure, uetype='/Script/ShooterGame.PrimalDinoStatusComponent'):
+DCSC_CLS = '/Game/PrimalEarth/CoreBlueprints/DinoCharacterStatusComponent_BP.DinoCharacterStatusComponent_BP_C'
+DINO_CHR_CLS = '/Game/PrimalEarth/CoreBlueprints/Dino_Character_BP.Dino_Character_BP_C'
+
+COREMEDIA_PGD_PKG = '/Game/PrimalEarth/CoreBlueprints/COREMEDIA_PrimalGameData_BP'
+
+
+class PrimalDinoStatusComponent(UEProxyStructure, uetype=PDSC_CLS):
     # DevKit Verified
     AmountMaxGainedPerLevelUpValue = uefloats(*repeat(0, STAT_COUNT))
     AmountMaxGainedPerLevelUpValueTamed = uefloats(*repeat(0, STAT_COUNT))
@@ -33,10 +47,11 @@ class PrimalDinoStatusComponent(UEProxyStructure, uetype='/Script/ShooterGame.Pr
     # DevKit Unverified
 
 
-DCSC = PrimalDinoStatusComponent
+class DinoCharacterStatusComponent(PrimalDinoStatusComponent, uetype=DCSC_CLS):
+    pass
 
 
-class PrimalDinoCharacter(UEProxyStructure, uetype='/Script/ShooterGame.PrimalDinoCharacter'):
+class PrimalDinoCharacter(UEProxyStructure, uetype=PDC_CLS):
     # DevKit Verified
     BabyAgeSpeed = uefloats(0.033)  # TODO: needs raw data
     BabyGestationSpeed = uefloats(0.000035)  # TODO: needs raw data
@@ -76,14 +91,14 @@ class PrimalDinoCharacter(UEProxyStructure, uetype='/Script/ShooterGame.PrimalDi
     # DevKit Unverified
 
 
-class ShooterCharacterMovement(UEProxyStructure, uetype='/Script/ShooterGame.ShooterCharacterMovement'):
+class ShooterCharacterMovement(UEProxyStructure, uetype=SHOOTER_CHR_MOVEMENT_CLS):
     # DevKit Verified
     Mass = uefloats(100.0)
 
     # DevKit Unverified
 
 
-class PrimalGameData(UEProxyStructure, uetype='/Script/ShooterGame.PrimalGameData'):
+class PrimalGameData(UEProxyStructure, uetype=PGD_CLS):
     # DevKit Verified
     ModDescription = uestrings('')
     ModName = uestrings('')
@@ -94,7 +109,7 @@ class PrimalGameData(UEProxyStructure, uetype='/Script/ShooterGame.PrimalGameDat
     # DevKit Unverified
 
 
-class PrimalItem(UEProxyStructure, uetype='/Script/ShooterGame.PrimalItem'):
+class PrimalItem(UEProxyStructure, uetype=PRIMAL_ITEM_CLS):
     # DevKit Verified
     bSupportDragOntoOtherItem = uebools(False)
     DescriptiveNameBase = uestrings('')
@@ -110,7 +125,7 @@ class PrimalItem(UEProxyStructure, uetype='/Script/ShooterGame.PrimalItem'):
     # DevKit Unverified
 
 
-class PrimalItem_Dye(PrimalItem, uetype='/Script/ShooterGame.PrimalItem_Dye'):
+class PrimalItem_Dye(PrimalItem, uetype=PRIMAL_ITEM_DYE_CLS):
     bSupportDragOntoOtherItem = uebools(True)
     # DevKit Verified
     DyeColor: Mapping[int, LinearColor]  # = (0.0, 0.0, 0.0, 0.0)
@@ -119,7 +134,7 @@ class PrimalItem_Dye(PrimalItem, uetype='/Script/ShooterGame.PrimalItem_Dye'):
     # DevKit Unverified
 
 
-class PrimalDinoSettings(UEProxyStructure, uetype='/Script/ShooterGame.PrimalDinoSettings'):
+class PrimalDinoSettings(UEProxyStructure, uetype=PRIMAL_DINO_SETTINGS_CLS):
     # DevKit Verified
     DinoFoodTypeName = uestrings('')
     TamingAffinityNoFoodDecreasePercentageSpeed = uefloats(0.0075)  # TODO: needs raw data

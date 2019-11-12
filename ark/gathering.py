@@ -3,8 +3,8 @@ from typing import *
 from typing import cast
 
 import ark.asset
-from ark.common import CHR_CLS, DCSC_CLS, PDSC_CLS
-from ark.types import PrimalDinoStatusComponent
+import ark.tree
+from ark.types import DCSC_CLS, DINO_CHR_CLS, PDSC_CLS, DinoCharacterStatusComponent
 from ue.asset import ExportTableItem, UAsset
 from ue.base import UEBase
 from ue.context import ue_parsing_context
@@ -15,11 +15,7 @@ from ue.proxy import UEProxyStructure, get_proxy_for_type
 from ue.utils import get_clean_name, get_property
 
 
-def extract_properties_from_export(export,
-                                   props: Mapping[str, Mapping[int, UEBase]],
-                                   skip_top=False,
-                                   recurse=False,
-                                   report=False):
+def extract_properties_from_export(export, props: Dict[str, Dict[int, UEBase]], skip_top=False, recurse=False, report=False):
     '''Restricted version of old gather_properties that only act on a single export (and optionally its parents).'''
     if recurse:
         parent = ark.tree.get_parent_of_export(export)
@@ -34,25 +30,25 @@ def extract_properties_from_export(export,
         propname = str(prop.header.name)
         if propname:
             propindex = prop.header.index or 0
-            props[propname][propindex] = prop.value
+            props[propname][propindex] = cast(UEBase, prop.value)
 
 
 def find_default_export_for_asset(species_cls: ExportTableItem):
     return species_cls.asset.default_export
 
 
-def gather_dcsc_properties(species_cls: ExportTableItem, *, alt=False, report=False) -> PrimalDinoStatusComponent:
+def gather_dcsc_properties(species_cls: ExportTableItem, *, alt=False, report=False) -> DinoCharacterStatusComponent:
     '''
     Gather combined DCSC properties from a species, respecting CharacterStatusComponentPriority.
     '''
     assert species_cls.asset and species_cls.asset.loader
-    if not inherits_from(species_cls, CHR_CLS):
+    if not inherits_from(species_cls, DINO_CHR_CLS):
         raise ValueError("Supplied export should be a species character class")
 
     loader: AssetLoader = species_cls.asset.loader
     dcscs: List[Tuple[float, ExportTableItem]] = list()
 
-    proxy: PrimalDinoStatusComponent = get_proxy_for_type(DCSC_CLS, loader)
+    proxy: DinoCharacterStatusComponent = get_proxy_for_type(DCSC_CLS, loader)
 
     chain = list(find_parent_classes(species_cls, include_self=True))
 
@@ -81,7 +77,7 @@ def gather_dcsc_properties(species_cls: ExportTableItem, *, alt=False, report=Fa
         dcscs.sort(key=lambda p: -p[0])
 
         # Collect properties from each DCSC in order
-        props: Mapping[str, Mapping[int, UEBase]] = defaultdict(lambda: defaultdict(lambda: None))
+        props: Dict[str, Dict[int, UEBase]] = defaultdict(lambda: defaultdict(lambda: None))  # type: ignore
         for _, dcsc in dcscs:
             extract_properties_from_export(dcsc, props, skip_top=alt, recurse=True, report=True)
         proxy.update(props)

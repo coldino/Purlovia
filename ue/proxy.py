@@ -113,8 +113,10 @@ def _register_proxy(uetype: str, cls: Type[UEProxyStructure]):
 
 MISSING = object()
 
+Tproxy = TypeVar('Tproxy', bound=UEProxyStructure)
 
-def get_proxy_for_type(cls_name: str, loader: AssetLoader, default=MISSING) -> UEProxyStructure:
+
+def get_proxy_for_type(cls_name: str, loader: AssetLoader, default=MISSING) -> Tproxy:
     '''
     Step up through the inheritance tree to find the first available proxy type.
     '''

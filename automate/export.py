@@ -9,8 +9,8 @@ from typing import *
 
 import ark.discovery
 import ark.properties
-from ark.common import PGD_PKG
 from ark.export_asb_values import values_for_species, values_from_pgd
+from ark.types import COREMEDIA_PGD_PKG
 from automate.ark import ArkSteamManager
 from automate.version import createExportVersion
 from config import ConfigFile, get_global_config
@@ -86,7 +86,7 @@ class Exporter:
         species_values = self._convert_for_export(species_data, False)
 
         other: Dict[str, Any] = dict()
-        other.update(self._gather_color_data(PGD_PKG, require_override=False))
+        other.update(self._gather_color_data(COREMEDIA_PGD_PKG, require_override=False))
 
         self._export_values(species_values, version=version, moddata=None, other=other)
 

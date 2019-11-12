@@ -10,7 +10,6 @@ import ark.asset
 import ark.mod
 import ark.properties
 import ue.gathering
-from ark.common import *
 from ark.types import PrimalItem
 from ue.base import UEBase
 from ue.coretypes import *

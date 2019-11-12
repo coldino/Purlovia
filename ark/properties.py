@@ -4,13 +4,14 @@ from typing import Dict, List, Optional, Tuple
 import ark.asset
 import ark.tree
 from ark.tree import inherits_from
+from ark.types import DCSC_CLS
 from ue.asset import ExportTableItem, UAsset
 from ue.coretypes import UEBase
 from ue.utils import get_clean_name, get_property
 
-from .common import *
-
 PriorityPropDict = Dict[str, Dict[int, List[UEBase]]]
+
+MISSING = object()
 
 
 def extract_properties_from_export(export, props: PriorityPropDict, recurse=False):
@@ -87,7 +88,7 @@ def gather_properties_internal(asset: UAsset,
     return props
 
 
-def clean_value(value, fallback=None):
+def clean_value(value, fallback=MISSING):
     if value is None or isinstance(value, (int, str, bool)):
         return value
     if isinstance(value, float) and value == int(value):
@@ -100,12 +101,12 @@ def clean_value(value, fallback=None):
         return get_clean_name(value)
     if value.__class__.__name__ in ('ByteProperty', 'IntProperty', 'BoolProperty'):
         return value.value
-    if fallback:
+    if fallback is not MISSING:
         return fallback
     raise ValueError("Don't know how to handle a " + value.__class__.__name__)
 
 
-def clean_value_str(value, fallback=None):
+def clean_value_str(value, fallback=MISSING):
     if value is None or isinstance(value, (int, str, bool)):
         return str(value)
     if isinstance(value, float) and value == int(value):
@@ -118,7 +119,7 @@ def clean_value_str(value, fallback=None):
         return get_clean_name(value)
     if value.__class__.__name__ in ('ByteProperty', 'IntProperty', 'BoolProperty'):
         return str(value.value)
-    if fallback:
+    if fallback is not MISSING:
         return fallback
     raise ValueError("Don't know how to handle a " + value.__class__.__name__)
 
