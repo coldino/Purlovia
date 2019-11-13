@@ -7,6 +7,7 @@ from ue.proxy import *
 STAT_COUNT = 12
 COLOR_REGION_COUNT = 6
 
+PCSC_CLS = '/Script/ShooterGame.PrimalCharacterStatusComponent'
 PDSC_CLS = '/Script/ShooterGame.PrimalDinoStatusComponent'
 PDC_CLS = '/Script/ShooterGame.PrimalDinoCharacter'
 PGD_CLS = '/Script/ShooterGame.PrimalGameData'
@@ -21,28 +22,85 @@ DINO_CHR_CLS = '/Game/PrimalEarth/CoreBlueprints/Dino_Character_BP.Dino_Characte
 
 COREMEDIA_PGD_PKG = '/Game/PrimalEarth/CoreBlueprints/COREMEDIA_PrimalGameData_BP'
 
+FLOAT_0_2 = (0.20000000, 'cdcc4c3e')
+FLOAT_1_0 = (1.00000000, '0000803f')
+FLOAT_100_0 = (100.00000000, '0000c842')
 
-class PrimalDinoStatusComponent(UEProxyStructure, uetype=PDSC_CLS):
+
+class PrimalCharacterStatusComponent(UEProxyStructure, uetype=PCSC_CLS):
+    BabyDinoConsumingFoodRateMultiplier = uefloats((25.50000000, '0000cc41'))
+    BabyMaxHealthPercent = uefloats((0.10000000, 'cdcccc3d'))
+    BaseCharacterLevel = ueints(1)
+    BaseFoodConsumptionRate = uefloats((-0.02500000, 'cdccccbc'))
+    CrouchedWaterFoodConsumptionMultiplier = uefloats(FLOAT_1_0)
+    DinoMaxStatAddMultiplierImprinting = uefloats(
+        FLOAT_0_2,  # [0]
+        0,
+        FLOAT_0_2,  # [2]
+        0,
+        FLOAT_0_2,  # [4]
+        FLOAT_0_2,  # [5]
+        0,
+        FLOAT_0_2,  # [7]
+        FLOAT_0_2,  # [8]
+        FLOAT_0_2,  # [9]
+        0,
+        0,
+    )
+    DinoTamedAdultConsumingFoodRateMultiplier = uefloats(FLOAT_1_0)
+    ExtraBabyDinoConsumingFoodRateMultiplier = uefloats((20.00000000, '0000a041'))
+    ExtraFoodConsumptionMultiplier = uefloats(FLOAT_1_0)
+    ExtraTamedHealthMultiplier = uefloats((1.35000002, 'cdccac3f'))
+    FoodConsumptionMultiplier = uefloats(FLOAT_1_0)
+    KnockedOutTorpidityRecoveryRateMultiplier = uefloats((3.00000000, '00004040'))
+    MaxStatusValues = uefloats(
+        FLOAT_100_0,  # [0]
+        FLOAT_100_0,  # [1]
+        FLOAT_100_0,  # [2]
+        FLOAT_100_0,  # [3]
+        FLOAT_100_0,  # [4]
+        FLOAT_100_0,  # [5]
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    )
+    MaxTamingEffectivenessBaseLevelMultiplier = uefloats((0.50000000, '0000003f'))
+    ProneWaterFoodConsumptionMultiplier = uefloats(FLOAT_1_0)
+    RecoveryRateStatusValue = uefloats(
+        FLOAT_100_0,  # [0]
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    )
+    TamedBaseHealthMultiplier = uefloats(FLOAT_1_0)
+    TamingIneffectivenessMultiplier = uefloats(FLOAT_1_0)
+    TheMaxTorporIncreasePerBaseLevel = uefloats((0.06000000, '8fc2753d'))
+    WakingTameFoodConsumptionRateMultiplier = uefloats((2.00000000, '00000040'))
+    WalkingStaminaConsumptionRate = uefloats((-0.30000001, '9a9999be'))
+
+
+class PrimalDinoStatusComponent(PrimalCharacterStatusComponent, uetype=PDSC_CLS):
     # DevKit Verified
     AmountMaxGainedPerLevelUpValue = uefloats(*repeat(0, STAT_COUNT))
     AmountMaxGainedPerLevelUpValueTamed = uefloats(*repeat(0, STAT_COUNT))
-    BaseFoodConsumptionRate = uefloats(-0.025000)  # TODO: needs raw data
     bCanSuffocate = uebools(True)
     bCanSuffocateIfTamed = uebools(False)
     bForceGainOxygen = uebools(False)
     CanLevelUpValue = uefloats(*repeat(0, STAT_COUNT))
-    DinoMaxStatAddMultiplierImprinting = uefloats(0.2, 0, 0.2, 0, 0.2, 0.2, 0, 0.2, 0.2, 0.2, 0, 0)
     DontUseValue = uefloats(*repeat(0, STAT_COUNT))
-    ExtraTamedHealthMultiplier = uefloats(1.35)  # TODO: needs raw data
-    KnockedOutTorpidityRecoveryRateMultiplier = uefloats(3.0)
-    MaxStatusValues = uefloats(100, 100, 100, 100, 100, 100, 0, 0, 0, 0, 0, 0)
-    ProneWaterFoodConsumptionMultiplier = uefloats(1.0)
-    RecoveryRateStatusValue = uefloats(100.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    TamedBaseHealthMultiplier = uefloats(1.0)
     TamingMaxStatAdditions = uefloats(*repeat(0, STAT_COUNT))
     TamingMaxStatMultipliers = uefloats(*repeat(0, STAT_COUNT))
-    TheMaxTorporIncreasePerBaseLevel = uefloats(0.06)  # TODO: needs raw data
-    WakingTameFoodConsumptionRateMultiplier = uefloats(2.0)
 
     # DevKit Unverified
 
