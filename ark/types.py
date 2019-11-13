@@ -110,9 +110,20 @@ class DinoCharacterStatusComponent(PrimalDinoStatusComponent, uetype=DCSC_CLS):
 
 
 class PrimalDinoCharacter(UEProxyStructure, uetype=PDC_CLS):
+    BabyAgeSpeed = uefloats(0.03300000, '022b073d')
+    BabyGestationSpeed = uefloats(0.00003472, 'b4a21138')
+    ExtraBabyAgeSpeedMultiplier = uefloats(FLOAT_1_0)
+    ExtraBabyGestationSpeedMultiplier = uefloats(FLOAT_1_0)
+    ExtraTamedBaseHealthMultiplier = uefloats(FLOAT_1_0)
+    NewFemaleMaxTimeBetweenMating = uefloats(172800.00000000, '00c02848')
+    NewFemaleMinTimeBetweenMating = uefloats(64800.00000000, '00207d47')
+    RequiredTameAffinity = uefloats(FLOAT_100_0)
+    RequiredTameAffinityPerBaseLevel = uefloats(5.00000000, '0000a040')
+    TameIneffectivenessByAffinity = uefloats(20.00000000, '0000a041')
+    WakingTameFoodAffinityMultiplier = uefloats(1.60000002, 'cdcccc3f')
+    WakingTameFoodIncreaseMultiplier = uefloats(FLOAT_1_0)
+
     # DevKit Verified
-    BabyAgeSpeed = uefloats(0.033)  # TODO: needs raw data
-    BabyGestationSpeed = uefloats(0.000035)  # TODO: needs raw data
     bCanBeTamed = uebools(True)
     bCanBeTorpid = uebools(True)
     bCanHaveBaby = uebools(False)
@@ -129,17 +140,7 @@ class PrimalDinoCharacter(UEProxyStructure, uetype=PDC_CLS):
     DescriptiveName = uestrings('')  # StringProperty (Default: 'PrimalCharacter')
     DinoNameTag = uestrings('')  # NameProperty (Default: None)
     DragWeight = uefloats(35.0)
-    ExtraBabyAgeSpeedMultiplier = uefloats(1.0)
-    ExtraBabyGestationSpeedMultiplier = uefloats(1.0)
-    ExtraTamedBaseHealthMultiplier = uefloats(1.0)
-    NewFemaleMaxTimeBetweenMating = uefloats(172800.0)
-    NewFemaleMinTimeBetweenMating = uefloats(64800.0)
     PreventColorizationRegions = uebytes(*repeat(0, COLOR_REGION_COUNT))
-    RequiredTameAffinity = uefloats(100)
-    RequiredTameAffinityPerBaseLevel = uefloats(5.0)
-    TameIneffectivenessByAffinity = uefloats(20)
-    WakingTameFoodAffinityMultiplier = uefloats(1.6)  # TODO: needs raw data
-    WakingTameFoodIncreaseMultiplier = uefloats(1.0)
 
     RandomColorSetsMale: Mapping[int, ObjectProperty]  # = 'None'
     RandomColorSetsFemale: Mapping[int, ObjectProperty]  # = 'None'
