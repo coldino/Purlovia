@@ -1,6 +1,7 @@
 from logging import NullHandler, getLogger
 from typing import *
 
+import ue.gathering
 from ark.defaults import DONTUSESTAT_VALUES, IMPRINT_VALUES
 from ark.export_asb.bones import gather_damage_mults
 from ark.export_asb.breeding import gather_breeding_data
@@ -9,6 +10,7 @@ from ark.export_asb.immobilize import gather_immobilization_data
 from ark.export_asb.stats import gather_stat_data
 from ark.export_asb.taming import gather_taming_data
 from ark.properties import PriorityPropDict, gather_properties, stat_value
+from ark.types import PrimalGameData
 from ue.asset import UAsset
 from ue.loader import AssetLoader, AssetNotFound, ModNotFound
 
@@ -53,13 +55,13 @@ ARK_STAT_INDEXES = tuple(range(12))
 
 
 def values_from_pgd(asset: UAsset, require_override: bool = False) -> Dict[str, Any]:
-    assert asset and asset.loader
+    assert asset and asset.loader and asset.default_export
     loader = asset.loader
-    props = gather_properties(asset)
+    props: PrimalGameData = ue.gathering.gather_properties(asset.default_export)
 
     result: Dict[str, Any] = dict()
 
-    colors, dyes = gather_pgd_colors(props, loader, require_override=require_override)
+    colors, dyes = gather_pgd_colors(asset, props, loader, require_override=require_override)
     if colors:
         result['colorDefinitions'] = colors
     if dyes:
