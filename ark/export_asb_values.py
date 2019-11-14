@@ -1,6 +1,7 @@
 from logging import NullHandler, getLogger
 from typing import *
 
+import ark.gathering
 import ue.gathering
 from ark.defaults import DONTUSESTAT_VALUES, IMPRINT_VALUES
 from ark.export_asb.bones import gather_damage_mults
@@ -10,7 +11,7 @@ from ark.export_asb.immobilize import gather_immobilization_data
 from ark.export_asb.stats import gather_stat_data
 from ark.export_asb.taming import gather_taming_data
 from ark.properties import PriorityPropDict, gather_properties, stat_value
-from ark.types import PrimalGameData
+from ark.types import PrimalDinoCharacter, PrimalDinoStatusComponent, PrimalGameData
 from ue.asset import UAsset
 from ue.loader import AssetLoader, AssetNotFound, ModNotFound
 
@@ -79,15 +80,16 @@ def values_for_species(asset: UAsset,
                        includeImmobilize=True,
                        includeDamageMults=True,
                        includeTaming=True):
-    assert asset.loader
+    assert asset.loader and asset.default_export and asset.default_class and asset.default_class.fullname
 
-    name = stat_value(props, 'DescriptiveName', 0, None) or stat_value(props, 'DinoNameTag', 0, None)
+    char_props: PrimalDinoCharacter = ue.gathering.gather_properties(asset.default_export)
+    dcsc_props: PrimalDinoStatusComponent = ark.gathering.gather_dcsc_properties(asset.default_export)
+
+    name = str(char_props.DescriptiveName[0]) or str(char_props.DinoNameTag[0])
+    # name = stat_value(props, 'DescriptiveName', 0, None) or stat_value(props, 'DinoNameTag', 0, None)
     if not name:
         logger.warning(f"Species {asset.assetname} has no DescriptiveName or DinoNameTag - skipping")
         return
-        name = '<unnamed species>'
-
-    assert asset.assetname and asset.default_export and asset.default_class and asset.default_class.fullname
 
     modid: str = asset.loader.get_mod_id(asset.assetname)
     overrides = get_overrides_for_species(asset.assetname, modid)
@@ -98,20 +100,23 @@ def values_for_species(asset: UAsset,
         bp = bp[:-2]
 
     # Replace names to match ASB's hardcoding of specific species
-    name = overrides.descriptive_name or name
-    species = dict(name=name, blueprintPath=bp)
+    name = overrides.descriptive_name or name.strip()
+    species: Dict[str, Any] = dict(name=name, blueprintPath=bp)
 
     # Stat data
-    statsField = 'fullStatsRaw' if fullStats else 'statsRaw'
-    statIndexes = ARK_STAT_INDEXES if fullStats else ASB_STAT_INDEXES
-    species[statsField] = gather_stat_data(props, statIndexes)
+    species['fullStatsRaw'] = gather_stat_data(props, ARK_STAT_INDEXES)
 
     # Set imprint multipliers
     stat_imprint_mults: List[float] = list()
-    for ark_index in statIndexes:
-        imprint_mult = stat_value(props, 'DinoMaxStatAddMultiplierImprinting', ark_index, IMPRINT_VALUES)
-        stat_imprint_mults.append(imprint_mult)
-    if stat_imprint_mults != list(IMPRINT_VALUES):
+    unique_mults = False
+    for stat_index in ARK_STAT_INDEXES:
+        imprint_mult = dcsc_props.DinoMaxStatAddMultiplierImprinting[stat_index]
+        stat_imprint_mults.append(imprint_mult.rounded_value)
+        # TODO: Should remove the dependancy of the default
+        if imprint_mult.rounded_value != IMPRINT_VALUES[stat_index]:
+            unique_mults = True
+
+    if unique_mults:
         species['statImprintMult'] = stat_imprint_mults
 
     if includeImmobilize:
@@ -178,7 +183,7 @@ def values_for_species(asset: UAsset,
 
     displayed_stats: int = 0
 
-    for i in statIndexes:
+    for i in ARK_STAT_INDEXES:
         use_stat = not stat_value(props, 'DontUseValue', i, DONTUSESTAT_VALUES)
         if use_stat and not (i == 3 and doesntUseOxygen):
             displayed_stats |= (1 << i)
