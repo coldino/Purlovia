@@ -49,7 +49,7 @@ jobs:
           pipenvvenv-${{ runner.OS }}-
 
     - name: Create virtualenv and install deps
-      run: pipenv install --deploy --python ${{ matrix.python_version }}
+      run: pipenv install --dev --deploy --python ${{ matrix.python_version }}
 
     - name: Check for vulnerable deps
       run: pipenv check
